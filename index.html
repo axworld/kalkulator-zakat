@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kalkulator Qada Zakat Lapangan</title>
+  <title>Kalkulator Zakat Lapangan</title>
   
   <!-- Tetapan PWA & Mobile Web App -->
   <meta name="theme-color" content="#0284c7">
@@ -292,7 +292,7 @@
     <!-- Header -->
     <div class="top-bar">
       <div>
-        <h1>Kalkulator Qada Zakat</h1>
+        <h1>Kalkulator Zakat</h1>
         <p>Alatan Lapangan Pegawai Jualan</p>
       </div>
       <button class="btn-cart-badge" onclick="openCartModal()" id="cartBadge">0 Troli</button>
@@ -406,10 +406,10 @@
     <button class="btn btn-add" id="btnAddCart" onclick="addToCart()" disabled>+ Troli</button>
   </div>
 
-  <!-- Modal Troli Qada -->
+  <!-- Modal Troli -->
   <div class="modal-backdrop" id="cartModal" onclick="closeCartModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Ringkasan Troli Qada Zakat</h3>
+      <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Ringkasan Troli Zakat</h3>
       <div id="cartItemsList">Tiada rekod dalam troli.</div>
       
       <div class="cart-total-bar">
@@ -601,7 +601,7 @@
         return;
       }
       let total = 0;
-      let msg = "*RINGKASAN TAKSIRAN QADA ZAKAT*\n";
+      let msg = "*RINGKASAN TAKSIRAN ZAKAT*\n";
       msg += "------------------------------\n";
       cart.forEach(item => {
         total += item.zakat;
