@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kalkulator Zakat Lapangan</title>
+  <title>Kalkulator Zakat Gabungan Harta</title>
   
-  <!-- Tetapan PWA & Mobile Web App -->
   <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +15,6 @@
       --primary: #0284c7;
       --primary-dark: #0369a1;
       --success: #059669;
-      --success-light: #ecfdf5;
       --danger: #dc2626;
       --slate-50: #f8fafc;
       --slate-100: #f1f5f9;
@@ -32,32 +30,19 @@
       color: var(--slate-800);
       margin: 0;
       padding: 12px;
-      padding-bottom: 90px;
+      padding-bottom: 95px;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
+    .container { max-width: 600px; margin: 0 auto; }
 
-    /* Header & Bar Status */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
     }
-    .top-bar h1 {
-      font-size: 1.15rem;
-      margin: 0;
-      font-weight: 700;
-      color: var(--slate-800);
-    }
-    .top-bar p {
-      font-size: 0.75rem;
-      color: #64748b;
-      margin: 2px 0 0 0;
-    }
+    .top-bar h1 { font-size: 1.15rem; margin: 0; font-weight: 700; color: var(--slate-800); }
+    .top-bar p { font-size: 0.75rem; color: #64748b; margin: 2px 0 0 0; }
     .btn-cart-badge {
       background: #ecfdf5;
       color: var(--success);
@@ -69,7 +54,6 @@
       cursor: pointer;
     }
 
-    /* Kad Utama */
     .card {
       background: #ffffff;
       border-radius: 12px;
@@ -84,12 +68,18 @@
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--slate-700);
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+    }
+    .sublabel {
+      display: block;
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-bottom: 6px;
     }
 
     select, input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 8px;
       border: 1px solid var(--slate-200);
       font-size: 0.95rem;
@@ -100,13 +90,13 @@
       outline: none;
       border-color: var(--primary);
     }
-
-    /* Mod Pengiraan */
-    .mode-pills {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+    input:disabled {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
     }
+
+    .mode-pills { display: flex; gap: 8px; margin-bottom: 12px; }
     .mode-pill {
       flex: 1;
       text-align: center;
@@ -124,7 +114,6 @@
       color: var(--primary-dark);
     }
 
-    /* Accordion Input */
     details {
       background: #ffffff;
       border: 1px solid var(--slate-200);
@@ -145,11 +134,18 @@
       gap: 10px;
       padding: 12px;
     }
-    .form-grid.full {
-      grid-template-columns: 1fr;
+    .form-grid.full { grid-template-columns: 1fr; }
+
+    .kifayah-summary-box {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
-    /* Widget Nisab */
     .nisab-monitor {
       background: #f8fafc;
       border: 1px dashed var(--slate-200);
@@ -173,7 +169,6 @@
       margin-top: 8px;
     }
 
-    /* Kotak Keputusan Pengiraan */
     .result-box {
       display: none;
       border-left: 4px solid var(--success);
@@ -197,7 +192,6 @@
       color: #64748b;
     }
 
-    /* Bar Tindakan Bawah (Sticky Mobile Action Bar) */
     .sticky-actions {
       position: fixed;
       bottom: 0;
@@ -226,7 +220,6 @@
     .btn-add { background: var(--success); color: #ffffff; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* Modal Troli */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -289,10 +282,9 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
     <div class="top-bar">
       <div>
-        <h1>Kalkulator Zakat</h1>
+        <h1>Kalkulator Zakat Gabungan Harta</h1>
         <p>Alatan Lapangan Pegawai Jualan</p>
       </div>
       <button class="btn-cart-badge" onclick="openCartModal()" id="cartBadge">0 Troli</button>
@@ -301,7 +293,7 @@
     <!-- Pilihan Tahun Masihi & Nisab -->
     <div class="card">
       <label for="yearSelect">Pilih Tahun / Penggal Taksiran</label>
-      <select id="yearSelect" onchange="handleYearChange()">
+      <select id="yearSelect" onchange="updateLiveMonitor()">
         <option value="2026_H2">2026 H2 (Jul - Dis)</option>
         <option value="2026_H1">2026 H1 (Jan - Jun)</option>
         <option value="2025_H2">2025 H2 (Jul - Dis)</option>
@@ -319,44 +311,139 @@
 
     <!-- Bahagian Mod 1: Borang Harta -->
     <div id="sectionAsset">
+      
+      <!-- 1. Pendapatan Penuh (Mengikut Rajah Gambar 2) -->
       <details open>
-        <summary>💼 Pendapatan & Elaun Setahun</summary>
+        <summary>📊 Pendapatan (Sumber Pendapatan Tahunan)</summary>
         <div class="form-grid">
-          <div><label>Gaji Kasar (RM)</label><input type="number" id="in_gaji" placeholder="0"></div>
-          <div><label>Bonus / Hadiah (RM)</label><input type="number" id="in_bonus" placeholder="0"></div>
-          <div><label>Pendapatan Sewa (RM)</label><input type="number" id="in_sewa" placeholder="0"></div>
-          <div><label>Kerja Sampingan (RM)</label><input type="number" id="in_sampingan" placeholder="0"></div>
+          <div>
+            <label>Gaji (RM)</label>
+            <span class="sublabel">Gaji tahunan</span>
+            <input type="number" id="in_gaji" placeholder="0">
+          </div>
+          <div>
+            <label>Pendapatan Bebas (RM)</label>
+            <span class="sublabel">Kerja bebas / sambilan</span>
+            <input type="number" id="in_sampingan" placeholder="0">
+          </div>
+          <div>
+            <label>Pendapatan Sewa (RM)</label>
+            <span class="sublabel">Dari harta sewa</span>
+            <input type="number" id="in_sewa" placeholder="0">
+          </div>
+          <div>
+            <label>Hadiah / Bonus (RM)</label>
+            <span class="sublabel">Hadiah, bonus, lain-lain</span>
+            <input type="number" id="in_bonus" placeholder="0">
+          </div>
+          <div>
+            <label>Pengeluaran KWSP &lt; 55 Thn</label>
+            <span class="sublabel">Bawah umur persaraan</span>
+            <input type="number" id="in_kwsp_bawah55" placeholder="0">
+          </div>
+          <div>
+            <label>KWSP 55/60 Thn (Akaun Emas)</label>
+            <span class="sublabel">Ketika capai umur 55/60</span>
+            <input type="number" id="in_kwsp_akaunemas" placeholder="0">
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Akaun 3 Semasa (Fleksibel)</label>
+            <span class="sublabel">Caruman Akaun 3 tahun semasa</span>
+            <input type="number" id="in_kwsp_akaun3" placeholder="0">
+          </div>
         </div>
       </details>
 
+      <!-- 2. Simpanan & Pelaburan -->
       <details>
-        <summary>🏦 Simpanan & KWSP</summary>
+        <summary>🏦 Simpanan, Emas & Saham</summary>
         <div class="form-grid">
           <div><label>Simpanan Bank (RM)</label><input type="number" id="in_simpanan" placeholder="0"></div>
-          <div><label>Simpanan Tetap (RM)</label><input type="number" id="in_fd" placeholder="0"></div>
+          <div><label>Simpanan Tetap / FD (RM)</label><input type="number" id="in_fd" placeholder="0"></div>
           <div><label>E-Wallet / Tunai (RM)</label><input type="number" id="in_tunai" placeholder="0"></div>
-          <div><label>KWSP Pengeluaran (RM)</label><input type="number" id="in_kwsp" placeholder="0"></div>
-        </div>
-      </details>
-
-      <details>
-        <summary>🪙 Emas & Pelaburan</summary>
-        <div class="form-grid">
           <div><label>Emas Simpanan/Bar (RM)</label><input type="number" id="in_emas" placeholder="0"></div>
           <div><label>Saham / Unit Trust (RM)</label><input type="number" id="in_saham" placeholder="0"></div>
-          <div style="grid-column: span 2;"><label>Kripto (RM)</label><input type="number" id="in_kripto" placeholder="0"></div>
+          <div><label>Kriptowang (RM)</label><input type="number" id="in_kripto" placeholder="0"></div>
         </div>
       </details>
 
+      <!-- 3. Had Kifayah (Mengikut Rajah Gambar 1) -->
       <details>
-        <summary>👨‍👩‍👧‍👦 Tolakan Had Kifayah (Belanja)</summary>
+        <summary>👨‍👩‍👧‍👦 Penolakan Had Kifayah (Belanja Asasi)</summary>
+        <div style="padding: 12px 12px 0 12px;">
+          <div class="kifayah-summary-box">
+            <div><small style="color:#065f46;">Jumlah Tanggungan</small><br><b id="txtKifayahHeadCount" style="color:#065f46;">1 orang</b></div>
+            <div style="text-align: right;"><small style="color:#065f46;">Jumlah Potongan</small><br><b id="txtKifayahTotalDeduction" style="color:var(--success); font-size:1.05rem;">RM 14,580.00</b></div>
+          </div>
+        </div>
+
         <div class="form-grid">
-          <div><label>Bilangan Isteri</label><input type="number" id="dep_spouse" placeholder="0"></div>
-          <div><label>Anak Bersekolah (7-17)</label><input type="number" id="dep_school" placeholder="0"></div>
-          <div><label>Anak Kecil (0-6)</label><input type="number" id="dep_baby" placeholder="0"></div>
-          <div><label>Caruman KWSP Sendiri (RM)</label><input type="number" id="ded_epf" placeholder="0"></div>
+          <!-- Ketua Keluarga (Compulsory Greyed Out) -->
+          <div>
+            <label>Ketua Keluarga (Wajib)</label>
+            <input type="number" value="1" disabled style="background:#e2e8f0; font-weight:700;">
+          </div>
+          <div>
+            <label>Isteri</label>
+            <input type="number" id="dep_spouse" placeholder="0">
+          </div>
+          <div>
+            <label>Dewasa Bekerja (≥18 thn)</label>
+            <input type="number" id="dep_working_adult" placeholder="0">
+          </div>
+          <div>
+            <label>Dewasa Tdk Bekerja (≥18 thn)</label>
+            <input type="number" id="dep_nonworking_adult" placeholder="0">
+          </div>
+          <div>
+            <label>Tanggungan Belajar IPT</label>
+            <input type="number" id="dep_ipt" placeholder="0">
+          </div>
+          <div>
+            <label>Tanggungan 7–17 Tahun</label>
+            <input type="number" id="dep_school717" placeholder="0">
+          </div>
+          <div>
+            <label>Tanggungan ≤6 Tahun</label>
+            <input type="number" id="dep_child06" placeholder="0">
+          </div>
+          <div>
+            <label>Tanggungan Anak OKU</label>
+            <input type="number" id="dep_oku" placeholder="0">
+          </div>
+          <div>
+            <label>Tanggungan Pesakit Kronik</label>
+            <input type="number" id="dep_chronic" placeholder="0">
+          </div>
+          <div>
+            <label>Kos Penjagaan Anak</label>
+            <input type="number" id="dep_childcare" placeholder="0">
+          </div>
         </div>
       </details>
+
+      <!-- 4. Pelarasan Tabung Haji & Harta Tak Patuh Syariah -->
+      <details>
+        <summary>⚖️ Pelarasan Tabung Haji & Tidak Patuh Syariah</summary>
+        <div class="form-grid">
+          <div style="grid-column: span 2;">
+            <label>Potongan Simpanan Tabung Haji (RM)</label>
+            <span class="sublabel">Telah dizakatkan oleh pihak Tabung Haji (elak bayar 2 kali)</span>
+            <input type="number" id="adj_tabung_haji" placeholder="0.00">
+          </div>
+          <div>
+            <label>Caruman KWSP Sendiri (RM)</label>
+            <span class="sublabel">Potongan caruman kwsp wajib tahunan</span>
+            <input type="number" id="ded_epf_annual" placeholder="0.00">
+          </div>
+          <div>
+            <label>Pulangan Tak Patuh Syariah (RM)</label>
+            <span class="sublabel">Faedah riba / keuntungan tidak patuh syariah (dibersihkan)</span>
+            <input type="number" id="adj_non_shariah" placeholder="0.00">
+          </div>
+        </div>
+      </details>
+
     </div>
 
     <!-- Bahagian Mod 2: Jumlah Terus -->
@@ -372,7 +459,7 @@
         <span id="badgeNisab" class="badge-status fail">Belum Cukup Nisab</span>
       </div>
       <div class="stat-row">
-        <span>Jumlah Harta Terkumpul:</span>
+        <span>Jumlah Harta Bersih:</span>
         <b id="txtTotalHarta">RM 0.00</b>
       </div>
       <div class="stat-row">
@@ -409,7 +496,7 @@
   <!-- Modal Troli -->
   <div class="modal-backdrop" id="cartModal" onclick="closeCartModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Ringkasan Troli Zakat</h3>
+      <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Ringkasan Troli Zakat Gabungan Harta</h3>
       <div id="cartItemsList">Tiada rekod dalam troli.</div>
       
       <div class="cart-total-bar">
@@ -432,7 +519,20 @@
       "2024_H1": { label: "2024 H1 (Jan - Jun)", nisab: 30120.00 }
     };
 
-    const KIFAYAH = { self: 14760, spouse: 6840, school: 6480, baby: 3480 };
+    // Kadar Rasmi Had Kifayah LZS
+    const KIFAYAH_RATES = {
+      head: 14580,
+      spouse: 2004,
+      workingAdult: 4944,
+      nonWorkingAdult: 2004,
+      ipt: 7356,
+      school717: 4896,
+      child06: 2100,
+      oku: 2964,
+      chronic: 2916,
+      childcare: 3960
+    };
+
     let currentMode = "asset";
     let calculatedData = null;
     let cart = JSON.parse(localStorage.getItem("zakat_field_cart") || "[]");
@@ -450,8 +550,31 @@
       updateLiveMonitor();
     }
 
-    function handleYearChange() {
-      updateLiveMonitor();
+    // Kira Jumlah Had Kifayah & Bilangan Tanggungan
+    function getHadKifayahData() {
+      const counts = {
+        spouse: getNum("dep_spouse"),
+        workingAdult: getNum("dep_working_adult"),
+        nonWorkingAdult: getNum("dep_nonworking_adult"),
+        ipt: getNum("dep_ipt"),
+        school717: getNum("dep_school717"),
+        child06: getNum("dep_child06"),
+        oku: getNum("dep_oku"),
+        chronic: getNum("dep_chronic"),
+        childcare: getNum("dep_childcare")
+      };
+
+      let headCount = 1; // 1 orang wajib untuk Ketua Keluarga
+      let totalDeduction = KIFAYAH_RATES.head; // RM 14,580.00 wajib
+
+      for (const [key, count] of Object.entries(counts)) {
+        if (count > 0) {
+          headCount += count;
+          totalDeduction += count * KIFAYAH_RATES[key];
+        }
+      }
+
+      return { headCount, totalDeduction };
     }
 
     function updateLiveMonitor() {
@@ -461,13 +584,40 @@
 
       let totalHarta = 0;
       if (currentMode === "asset") {
-        const pendapatan = getNum("in_gaji") + getNum("in_bonus") + getNum("in_sewa") + getNum("in_sampingan");
-        const simpanan = getNum("in_simpanan") + getNum("in_fd") + getNum("in_tunai") + getNum("in_kwsp");
-        const pelaburan = getNum("in_emas") + getNum("in_saham") + getNum("in_kripto");
-        const tolakan = KIFAYAH.self + (getNum("dep_spouse") * KIFAYAH.spouse) + (getNum("dep_school") * KIFAYAH.school) + (getNum("dep_baby") * KIFAYAH.baby) + getNum("ded_epf");
-        
-        const bersih = Math.max(0, pendapatan - tolakan);
-        totalHarta = bersih + simpanan + pelaburan;
+        // 1. Pendapatan Kasar
+        const pendapatanKasar = 
+          getNum("in_gaji") + 
+          getNum("in_sampingan") + 
+          getNum("in_sewa") + 
+          getNum("in_bonus") + 
+          getNum("in_kwsp_bawah55") + 
+          getNum("in_kwsp_akaunemas") + 
+          getNum("in_kwsp_akaun3");
+
+        // 2. Simpanan & Pelaburan
+        const pelaburanSimpanan = 
+          getNum("in_simpanan") + 
+          getNum("in_fd") + 
+          getNum("in_tunai") + 
+          getNum("in_emas") + 
+          getNum("in_saham") + 
+          getNum("in_kripto");
+
+        // 3. Had Kifayah
+        const { headCount, totalDeduction } = getHadKifayahData();
+        document.getElementById("txtKifayahHeadCount").innerText = `${headCount} orang`;
+        document.getElementById("txtKifayahTotalDeduction").innerText = `RM ${totalDeduction.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+        // 4. Tolakan Lain & Pelarasan (Tabung Haji & Harta Tak Patuh Syariah)
+        const epf = getNum("ded_epf_annual");
+        const tabungHaji = getNum("adj_tabung_haji");
+        const nonShariah = getNum("adj_non_shariah");
+
+        const totalTolakan = totalDeduction + epf + tabungHaji + nonShariah;
+
+        // Pendapatan bersih selepas tolakan
+        const pendapatanBersih = Math.max(0, pendapatanKasar - totalTolakan);
+        totalHarta = pendapatanBersih + pelaburanSimpanan;
       } else {
         totalHarta = getNum("in_direct_val");
       }
@@ -497,12 +647,31 @@
       let totalHarta = 0;
 
       if (currentMode === "asset") {
-        const pendapatan = getNum("in_gaji") + getNum("in_bonus") + getNum("in_sewa") + getNum("in_sampingan");
-        const simpanan = getNum("in_simpanan") + getNum("in_fd") + getNum("in_tunai") + getNum("in_kwsp");
-        const pelaburan = getNum("in_emas") + getNum("in_saham") + getNum("in_kripto");
-        const tolakan = KIFAYAH.self + (getNum("dep_spouse") * KIFAYAH.spouse) + (getNum("dep_school") * KIFAYAH.school) + (getNum("dep_baby") * KIFAYAH.baby) + getNum("ded_epf");
-        
-        totalHarta = Math.max(0, pendapatan - tolakan) + simpanan + pelaburan;
+        const pendapatanKasar = 
+          getNum("in_gaji") + 
+          getNum("in_sampingan") + 
+          getNum("in_sewa") + 
+          getNum("in_bonus") + 
+          getNum("in_kwsp_bawah55") + 
+          getNum("in_kwsp_akaunemas") + 
+          getNum("in_kwsp_akaun3");
+
+        const pelaburanSimpanan = 
+          getNum("in_simpanan") + 
+          getNum("in_fd") + 
+          getNum("in_tunai") + 
+          getNum("in_emas") + 
+          getNum("in_saham") + 
+          getNum("in_kripto");
+
+        const { totalDeduction } = getHadKifayahData();
+        const epf = getNum("ded_epf_annual");
+        const tabungHaji = getNum("adj_tabung_haji");
+        const nonShariah = getNum("adj_non_shariah");
+
+        const totalTolakan = totalDeduction + epf + tabungHaji + nonShariah;
+        totalHarta = Math.max(0, pendapatanKasar - totalTolakan) + pelaburanSimpanan;
+
         if (totalHarta >= yearObj.nisab) {
           zakatAmount = totalHarta * 0.025;
         }
@@ -530,7 +699,9 @@
     }
 
     function resetForm() {
-      document.querySelectorAll("input").forEach(i => i.value = "");
+      document.querySelectorAll("input").forEach(i => {
+        if (!i.disabled) i.value = "";
+      });
       document.getElementById("resultCard").style.display = "none";
       document.getElementById("btnAddCart").disabled = true;
       calculatedData = null;
@@ -567,7 +738,7 @@
           <div class="cart-item">
             <div>
               <strong>${item.label}</strong><br>
-              <small>Harta: RM ${item.totalHarta.toLocaleString()}</small>
+              <small>Harta Bersih: RM ${item.totalHarta.toLocaleString()}</small>
             </div>
             <div style="text-align: right;">
               <b>RM ${item.zakat.toLocaleString(undefined, {minimumFractionDigits: 2})}</b><br>
@@ -601,7 +772,7 @@
         return;
       }
       let total = 0;
-      let msg = "*RINGKASAN TAKSIRAN ZAKAT*\n";
+      let msg = "*RINGKASAN TAKSIRAN ZAKAT GABUNGAN HARTA*\n";
       msg += "------------------------------\n";
       cart.forEach(item => {
         total += item.zakat;
@@ -614,7 +785,6 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // Pasang listener input
     document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("input").forEach(el => el.addEventListener("input", updateLiveMonitor));
       updateCartUI();
